@@ -16,6 +16,11 @@ fn main() {
     let result = resolve_value(&sequence, 1).unwrap();
 
     println!("Huge = {}", result);
+
+    let (result, _) = SpinLock::new(step).enumerate().take(50000001).filter(
+        |&(_, p)| p == 1).last().unwrap();
+
+    println!("Huge Fast = {}", result);
 }
 
 struct SpinLock {
@@ -105,5 +110,13 @@ mod test {
         let sequence = spinlock_history(50000001, 3);
 
         assert_eq!(1222153, resolve_value(&sequence, 1).unwrap());
+    }
+
+    #[test]
+    fn alternative_50000000() {
+        let (result, _) = SpinLock::new(3).enumerate().take(50000001).filter(
+            |&(_, p)| p == 1).last().unwrap();
+
+        assert_eq!(1222153, result);
     }
 }
